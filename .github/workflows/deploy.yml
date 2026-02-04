@@ -1,46 +1,41 @@
-name: Deploy Vite React to GitHub Pages
+name: Deploy Portfolio to GitHub Pages
 
+# Quy trình chạy khi có push vào nhánh main
 on:
   push:
     branches:
       - main
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+  contents: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # Bước 1: Lấy mã nguồn từ repo
+      - name: Checkout mã nguồn
         uses: actions/checkout@v4
 
+      # Bước 2: Thiết lập môi trường Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      # Bước 3: Cài đặt thư viện (dependencies)
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Build project
+      # Bước 4: Biên dịch dự án (Build)
+      - name: Build Project
         run: npm run build
 
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload build artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
+      # Bước 5: Triển khai lên GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist # Thư mục chứa code sau khi build (Vite dùng dist, CRA dùng build)
+          branch: gh-pages # Nhánh dùng để hosting website
